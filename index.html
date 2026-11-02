@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Installation Management v2.0</title>
+  
+  <!-- PWA Full-Screen Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 8px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    
+    /* HEADER WITH VGS LOGO */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 8px; }
+    .brand-wrap { display: flex; align-items: center; gap: 8px; }
+    .logo-vgs { width: 28px; height: 28px; background: #f59e0b; color: #000; font-weight: 900; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid #fbbf24; }
+    h1 { color: #f8fafc; font-size: 0.95rem; font-weight: 700; }
+    .header-metrics { display: flex; gap: 6px; }
+    .badge { background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; color: #94a3b8; }
+    .badge strong { color: #f59e0b; }
+
+    /* NON-OVERLAPPING SCROLLABLE TABS */
+    .tabs { display: flex; background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tab-btn { flex: 1 0 auto; min-width: 70px; padding: 10px 8px; text-align: center; background: none; border: none; color: #94a3b8; font-weight: 600; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { color: #f59e0b; border-bottom: 3px solid #f59e0b; background: #0f172a; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+    h2 { color: #f59e0b; font-size: 0.95rem; margin-bottom: 8px; }
+
+    label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
+    input, select { width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px; }
+    
+    .btn { background: #f59e0b; color: #000; font-weight: bold; padding: 10px 14px; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; font-size: 0.85rem; }
+    .btn-secondary { background: #334155; color: #fff; }
+    .btn-sm { padding: 6px 10px; font-size: 0.75rem; }
+
+    .contact-row { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 6px; margin-bottom: 6px; }
+    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 0.85rem; }
+
+    canvas { background: #ffffff; border-radius: 6px; width: 100%; height: 150px; touch-action: none; margin-bottom: 8px; }
+    .supply-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; gap: 8px; }
+    .supply-row label { margin: 0; font-size: 0.8rem; flex: 1; }
+    .supply-row input { width: 80px; margin: 0; text-align: center; }
+    .supply-row select { width: 100px; margin: 0; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header with VGS Emblem -->
+  <header>
+    <div class="brand-wrap">
+      <div class="logo-vgs">VGS</div>
+      <h1>Install Mgr v2.0</h1>
+    </div>
+    <div class="header-metrics">
+      <div class="badge">Units: <strong id="headDone">0</strong>/<span id="headTotal">0</span></div>
+      <div class="badge">Punch: <strong id="headPunch">0</strong></div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs">
+    <button id="btn-jobs" class="tab-btn active">Jobs</button>
+    <button id="btn-checklist" class="tab-btn">Checklist</button>
+    <button id="btn-punch" class="tab-btn">Punch</button>
+    <button id="btn-supplies" class="tab-btn">Supplies</button>
+    <button id="btn-sign" class="tab-btn">Sign-Off</button>
+  </div>
+
+  <!-- Jobs Tab -->
+  <div id="tab-jobs" class="tab-content active">
+    <div class="card">
+      <h2>Active Job Details</h2>
+      <label>Client Name / Site</label>
+      <input type="text" id="clientName" placeholder="e.g. Smith Residence">
+      
+      <label>Job Address</label>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="siteAddress" placeholder="123 Main St, Belleville" style="margin:0;">
+        <button type="button" class="btn" id="btnMaps">Navigate</button>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <div style="flex:1;">
+          <label>Total Units</label>
+          <input type="number" id="totalUnits" value="0">
+        </div>
+        <div style="flex:1;">
+          <label>Installed</label>
+          <input type="number" id="installedUnits" value="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Field Contacts</h2>
+      <div class="contact-row">
+        <div>
+          <strong>Bert</strong> <span style="font-size:0.7rem; color:#94a3b8;">(Vic's Glass)</span>
+          <div style="color:#f59e0b; font-size:0.8rem;">+1 613-438-5548</div>
+        </div>
+        <div style="display:flex; gap:4px;">
+          <a class="btn btn-sm" href="tel:+16134385548">Call</a>
+          <button type="button" class="btn btn-sm" id="btnSmsBert">SMS</button>
+        </div>
+      </div>
+
+      <div class="contact-row">
+        <div>
+          <strong>Kevin Clarke</strong> <span style="font-size:0.7rem; color:#94a3b8;">(Vic's Glass)</span>
+          <div style="color:#f59e0b; font-size:0.8rem;">+1 613-848-3549</div>
+        </div>
+        <div style="display:flex; gap:4px;">
+          <a class="btn btn-sm" href="tel:+16138483549">Call</a>
+          <button type="button" class="btn btn-sm" id="btnSmsKevin">SMS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checklist Tab -->
+  <div id="tab-checklist" class="tab-content">
+    <div class="card">
+      <h2>Unit Checklist</h2>
+      <div style="display:flex; gap:6px; margin-bottom:8px;">
+        <input type="text" id="chkInput" placeholder="Tag / Location..." style="margin:0;">
+        <button type="button" class="btn" id="btnAddChecklist">Add</button>
+      </div>
+      <div id="chkContainer"></div>
+    </div>
+  </div>
+
+  <!-- Punch List Tab -->
+  <div id="tab-punch" class="tab-content">
+    <div class="card">
+      <h2>Log Deficiency</h2>
+      <input type="text" id="punchInput" placeholder="Description (e.g. Scratched frame)">
+      <select id="punchSeverity">
+        <option value="Low">Low Severity</option>
+        <option value="Medium">Medium Severity</option>
+        <option value="High">High Severity</option>
+        <option value="Critical">Critical</option>
+      </select>
+      <button type="button" class="btn" style="width:100%; margin-bottom:8px;" id="btnAddPunch">Add Deficiency</button>
+      <div id="punchContainer"></div>
+    </div>
+  </div>
+
+  <!-- Supplies Tab -->
+  <div id="tab-supplies" class="tab-content">
+    <div class="card">
+      <h2>Static Supplies Logged</h2>
+      <div class="supply-row">
+        <label>Low-Expansion Foam (Cans)</label>
+        <input type="number" id="supFoam" value="0">
+      </div>
+      <div class="supply-row">
+        <label>Exterior Caulk (Tubes)</label>
+        <select id="supCaulkColor">
+          <option value="White">White</option>
+          <option value="Black">Black</option>
+          <option value="Custom">Custom...</option>
+        </select>
+        <input type="number" id="supCaulk" value="0">
+      </div>
+      <div id="customColorBox" style="display:none; margin-top:4px;">
+        <input type="text" id="supCaulkCustom" placeholder="Type custom color shade...">
+      </div>
+      <div class="supply-row">
+        <label>Cedar Shims (Packs)</label>
+        <input type="number" id="supShims" value="0">
+      </div>
+      <div class="supply-row">
+        <label>2 3/4" Interior Trim (Linear Ft)</label>
+        <input type="number" id="supTrim" value="0">
+      </div>
+      <div class="supply-row">
+        <label>Interior Sealant (Tubes)</label>
+        <input type="number" id="supSealant" value="0">
+      </div>
+      <div class="supply-row">
+        <label>Multi-Tool Blades (Packs/Units)</label>
+        <input type="number" id="supBlades" value="0">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Additional Materials</h2>
+      <div style="display:flex; gap:6px; margin-bottom:8px;">
+        <input type="text" id="matInput" placeholder="Material..." style="margin:0;">
+        <input type="number" id="matQty" placeholder="Qty" style="width:60px; margin:0;">
+        <button type="button" class="btn" id="btnAddMat">Add</button>
+      </div>
+      <div id="matContainer"></div>
+    </div>
+  </div>
+
+  <!-- Sign-Off Tab -->
+  <div id="tab-sign" class="tab-content">
+    <div class="card">
+      <h2>Customer Sign-Off</h2>
+      <canvas id="signatureCanvas"></canvas>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-secondary" style="flex:1;" id="btnClearSig">Clear Signature</button>
+        <button type="button" class="btn" style="flex:1;" onclick="window.print()">Print / PDF Report</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var appData = { client:'', addr:'', total:0, done:0, chk:[], punch:[], mat:[], supplies:{ foam:0, caulk:0, caulkColor:'White', caulkCustom:'', shims:0, trim:0, sealant:0, blades:0 } };
+
+  function setTab(name) {
+    var names = ['jobs', 'checklist', 'punch', 'supplies', 'sign'];
+    for (var i = 0; i < names.length; i++) {
+      document.getElementById('tab-' + names[i]).className = 'tab-content';
+      document.getElementById('btn-' + names[i]).className = 'tab-btn';
+    }
+    document.getElementById('tab-' + name).className = 'tab-content active';
+    document.getElementById('btn-' + name).className = 'tab-btn active';
+  }
+
+  function toggleCustomColor() {
+    var sel = document.getElementById('supCaulkColor').value;
+    document.getElementById('customColorBox').style.display = (sel === 'Custom') ? 'block' : 'none';
+  }
+
+  function saveData() {
+    appData.client = document.getElementById('clientName').value;
+    appData.addr = document.getElementById('siteAddress').value;
+    appData.total = document.getElementById('totalUnits').value;
+    appData.done = document.getElementById('installedUnits').value;
+    
+    appData.supplies = {
+      foam: document.getElementById('supFoam').value || 0,
+      caulk: document.getElementById('supCaulk').value || 0,
+      caulkColor: document.getElementById('supCaulkColor').value,
+      caulkCustom: document.getElementById('supCaulkCustom').value || '',
+      shims: document.getElementById('supShims').value || 0,
+      trim: document.getElementById('supTrim').value || 0,
+      sealant: document.getElementById('supSealant').value || 0,
+      blades: document.getElementById('supBlades').value || 0
+    };
+
+    document.getElementById('headDone').innerText = appData.done || 0;
+    document.getElementById('headTotal').innerText = appData.total || 0;
+    document.getElementById('headPunch').innerText = appData.punch.length || 0;
+
+    try {
+      localStorage.setItem('install_v2_store', JSON.stringify(appData));
+    } catch(e) {}
+  }
+
+  function renderChecklist() {
+    var html = '';
+    for (var i = 0; i < appData.chk.length; i++) {
+      html += '<div class="item-row"><span>' + appData.chk[i].txt + '</span><button type="button" class="btn btn-secondary btn-sm" onclick="delChk(' + appData.chk[i].id + ')">Done</button></div>';
+    }
+    document.getElementById('chkContainer').innerHTML = html;
+  }
+
+  function delChk(id) {
+    appData.chk = appData.chk.filter(function(x) { return x.id !== id; });
+    saveData(); renderChecklist();
+  }
+
+  function renderPunch() {
+    var html = '';
+    for (var i = 0; i < appData.punch.length; i++) {
+      html += '<div class="item-row"><div><strong>[' + appData.punch[i].sev + ']</strong> ' + appData.punch[i].txt + '</div><button type="button" class="btn btn-secondary btn-sm" onclick="delPunch(' + appData.punch[i].id + ')">Clear</button></div>';
+    }
+    document.getElementById('punchContainer').innerHTML = html;
+  }
+
+  function delPunch(id) {
+    appData.punch = appData.punch.filter(function(x) { return x.id !== id; });
+    saveData(); renderPunch();
+  }
+
+  function renderMat() {
+    var html = '';
+    for (var i = 0; i < appData.mat.length; i++) {
+      html += '<div class="item-row"><div>' + appData.mat[i].txt + ' (x' + appData.mat[i].qty + ')</div><button type="button" class="btn btn-secondary btn-sm" onclick="delMat(' + appData.mat[i].id + ')">Delete</button></div>';
+    }
+    document.getElementById('matContainer').innerHTML = html;
+  }
+
+  function delMat(id) {
+    appData.mat = appData.mat.filter(function(x) { return x.id !== id; });
+    saveData(); renderMat();
+  }
+
+  // Bind Events
+  window.addEventListener('DOMContentLoaded', function() {
+    var tabs = ['jobs', 'checklist', 'punch', 'supplies', 'sign'];
+    tabs.forEach(function(t) {
+      document.getElementById('btn-' + t).addEventListener('click', function() { setTab(t); });
+    });
+
+    var inputs = ['clientName', 'siteAddress', 'totalUnits', 'installedUnits', 'supFoam', 'supCaulk', 'supCaulkCustom', 'supShims', 'supTrim', 'supSealant', 'supBlades'];
+    inputs.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', saveData);
+        el.addEventListener('change', saveData);
+      }
+    });
+
+    document.getElementById('supCaulkColor').addEventListener('change', function() {
+      toggleCustomColor();
+      saveData();
+    });
+
+    document.getElementById('btnMaps').addEventListener('click', function() {
+      var a = document.getElementById('siteAddress').value;
+      if (a) window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(a), '_blank');
+    });
+
+    document.getElementById('btnSmsBert').addEventListener('click', function() {
+      var msg = 'Job Update: ' + (appData.client || 'Current Job') + '\nInstalled: ' + (appData.done || 0) + '/' + (appData.total || 0) + ' units.\nDeficiencies: ' + appData.punch.length + ' open.';
+      window.location.href = 'sms:+16134385548?body=' + encodeURIComponent(msg);
+    });
+
+    document.getElementById('btnSmsKevin').addEventListener('click', function() {
+      var msg = 'Job Update: ' + (appData.client || 'Current Job') + '\nInstalled: ' + (appData.done || 0) + '/' + (appData.total || 0) + ' units.\nDeficiencies: ' + appData.punch.length + ' open.';
+      window.location.href = 'sms:+16138483549?body=' + encodeURIComponent(msg);
+    });
+
+    document.getElementById('btnAddChecklist').addEventListener('click', function() {
+      var inp = document.getElementById('chkInput');
+      if (!inp.value.trim()) return;
+      appData.chk.push({ id: new Date().getTime(), txt: inp.value });
+      inp.value = ''; saveData(); renderChecklist();
+    });
+
+    document.getElementById('btnAddPunch').addEventListener('click', function() {
+      var txt = document.getElementById('punchInput');
+      var sev = document.getElementById('punchSeverity').value;
+      if (!txt.value.trim()) return;
+      appData.punch.push({ id: new Date().getTime(), txt: txt.value, sev: sev });
+      txt.value = ''; saveData(); renderPunch();
+    });
+
+    document.getElementById('btnAddMat').addEventListener('click', function() {
+      var txt = document.getElementById('matInput');
+      var qty = document.getElementById('matQty').value || 1;
+      if (!txt.value.trim()) return;
+      appData.mat.push({ id: new Date().getTime(), txt: txt.value, qty: qty });
+      txt.value = ''; document.getElementById('matQty').value = ''; saveData(); renderMat();
+    });
+
+    // Signature Canvas Setup
+    var cvs = document.getElementById('signatureCanvas');
+    var ctx = cvs.getContext('2d');
+    var drawing = false;
+    cvs.width = cvs.offsetWidth || 300;
+
+    cvs.addEventListener('touchstart', function(e) { drawing = true; e.preventDefault(); });
+    cvs.addEventListener('touchend', function() { drawing = false; ctx.beginPath(); });
+    cvs.addEventListener('touchmove', function(e) {
+      if (!drawing) return; e.preventDefault();
+      var t = e.touches[0]; var r = cvs.getBoundingClientRect();
+      ctx.lineWidth = 2; ctx.strokeStyle = '#000000';
+      ctx.lineTo(t.clientX - r.left, t.clientY - r.top); ctx.stroke(); ctx.beginPath();
+      ctx.moveTo(t.clientX - r.left, t.clientY - r.top);
+    });
+
+    document.getElementById('btnClearSig').addEventListener('click', function() {
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+    });
+
+    // Load Local Storage
+    try {
+      var saved = localStorage.getItem('install_v2_store');
+      if (saved) {
+        appData = JSON.parse(saved);
+        document.getElementById('clientName').value = appData.client || '';
+        document.getElementById('siteAddress').value = appData.addr || '';
+        document.getElementById('totalUnits').value = appData.total || 0;
+        document.getElementById('installedUnits').value = appData.done || 0;
+        
+        if (appData.supplies) {
+          document.getElementById('supFoam').value = appData.supplies.foam || 0;
+          document.getElementById('supCaulk').value = appData.supplies.caulk || 0;
+          document.getElementById('supCaulkColor').value = appData.supplies.caulkColor || 'White';
+          document.getElementById('supCaulkCustom').value = appData.supplies.caulkCustom || '';
+          document.getElementById('supShims').value = appData.supplies.shims || 0;
+          document.getElementById('supTrim').value = appData.supplies.trim || 0;
+          document.getElementById('supSealant').value = appData.supplies.sealant || 0;
+          document.getElementById('supBlades').value = appData.supplies.blades || 0;
+          toggleCustomColor();
+        }
+        renderChecklist(); renderPunch(); renderMat(); saveData();
+      }
+    } catch(e) {}
+  });
+</script>
+</body>
+</html>
