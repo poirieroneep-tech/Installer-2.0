@@ -1,0 +1,21 @@
+{
+  "name": "Installation Management",
+  "short_name": "Install Mgr",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme-color": "#0f172a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/0f172a/f59e0b?text=VGS",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512/0f172a/f59e0b?text=VGS",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
